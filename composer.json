@@ -3,10 +3,12 @@
     "description": "add option function to laravel",
     "license": "MIT",
     "type": "library",
-	"authors": {
-		"name": "shuangzhang",
-		"email": "likeshuangz@gmail.com"
-	},
+	"authors": [
+        {
+    		"name": "shuangzhang",
+    		"email": "likeshuangz@gmail.com"
+    	}
+    ],
     "require": {
         "php": ">=5.5.9",
         "laravel/framework": "5.2.*"
