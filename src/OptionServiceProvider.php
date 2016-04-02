@@ -14,22 +14,6 @@ class OptionServiceProvider extends ServiceProvider {
 	public function boot()
 	{
 		
-		// OptionModel::created(function ($option) {
-  //           //$option->forgetCached();
-  //       });
-
-  //       OptionModel::updated(function ($option) {
-  //           \Log::info($option." updated");
-  //       });
-
-  //       OptionModel::deleted(function ($option) {
-  //           //$option->forgetCached();
-  //       });
-
-  //       OptionModel::saved(function ($option) {
-  //       	\Log::info($option);
-  //           //$option->forgetCached();
-  //       });
 	}
 
 	/**
