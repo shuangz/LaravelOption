@@ -6,8 +6,12 @@ use Illuminate\Support\Facades\Cache;
 
 class OptionRepository{
 
-    use OptionFormater;
 
+    /**
+     * 已经从数据中取出的选项，相当于一个缓存。
+     * 下次获取时可以从这里获取
+     * @var array
+     */
     protected $autoload = array();
     
 
@@ -16,30 +20,17 @@ class OptionRepository{
         $this->loadAutoOptions();
     }
 
+    /**
+     * 构造时加载自动获取的选项
+     * @return [type] [description]
+     */
     public function loadAutoOptions()
     {
-        $autoload = OptionModel::where('autoload', '=', 1)->lists('value', 'name'); 
+        $collection  = OptionModel::where('autoload', '=', 1)->lists('value', 'name');
 
-        foreach ($autoload as $name => $value)
-        {
-            $this->autoload[$name] = $this->maybe_unserialize($value);
-        }
+        $this->autoload = $collection->all();
     }
 
-    public function cachePrefix()
-    {
-        return property_exists($this, 'cachePrefix') ? $this->cachePrefix : static::class."_cache:";
-    }
-
-    public function rememberForCached($key, $minutes, Closure $callback)
-    {
-        Cache::remember($this->cachePrefix().$key, $minutes, $callback);
-    }
-
-    public function putToCached($key, $value, $minutes = null)
-    {
-        Cache::put($this->cachePrefix().$key, $value, $minutes = null);
-    }
 
     /**
      * [get description]
@@ -49,76 +40,114 @@ class OptionRepository{
      */
     public function get($name, $default = null )
     {
-
+        
         $name = $this->sanitize_key( $name );
 
-        if ( empty( $name ) )
-        {
+
+        if ( empty( $name ) ) {
+
             return false;
         }
 
-        if (isset($this->autoload[$name]))
-        {
+        if (isset($this->autoload[$name])) {
+
             return $this->autoload[$name];
-        }
-        else
-        {
-            $value = $this->rememberForCached($name, 60, function() use ($name) {
-                            OptionModel::where('name', $name)->pluck('value');
-                        });
+
+        } else {
+
+            $value = Cache::remember($this->cachePrefix().$name, 60, function() use ($name) {
+                            return OptionModel::where('name', $name)->pluck('value')->first();
+                     });
+
 
             if ($value == null)
             {
                 return $default;
             }
 
-            $value                 = $this->maybe_unserialize($value);
             $this->autoload[$name] = $value;
             return $value;
         }
     }
 
-    public function update($name, $value)
+    /**
+     * 更新一个 option 如果不存在则新建并设置该值
+     * 
+     * @param  [type]  $name     [description]
+     * @param  [type]  $value    [description]
+     * @param  integer $autoload [description]
+     * @return [type]            [description]
+     */
+    public function update($name, $value, $autoload = 0)
     {
         $name  = $this->sanitize_key($name);
-        $value = $this->maybe_serialize( $value );
 
-        if ($this->get($name) !== null) {
+        $option = OptionModel::firstOrNew(['name' => $name]);
 
-            OptionModel::where('name', $name)->update(['value' => $value]);
+        $option->value    = $value;
+        $option->autoload = $autoload;
+        $option->save();
 
-            $this->putToCached($name, $value, 60);
+        $this->cacheValue($name, $value);
 
-        } else {
-
-            OptionModel::insert(['name' => $name, 'value' => $value]);
-
-            $this->putToCached($name, $value, 60);
-        }
-
-        $this->autoload[$name] = $value;
         return true;
     }
 
-    public function add($name, $value)
+    public function add($name, $value, $autoload = 0)
     {
         $name  = $this->sanitize_key($name);
-        $value = $this->maybe_serialize( $value );
 
-        if ($this->get($name) !== null)
-        {
+        $option = OptionModel::firstOrNew(['name' => $name]);
+
+        if ($option->exists) {
+
             return false;
-        }
-        else
-        {
-            OptionModel::insert(['name' => $name, 'value' => $value]);
 
-            $this->putToCached($name, $value, 60);
+        } else {
 
-        }
+            $option->value    = $value;
+            $option->autoload = $autoload;
+            $option->save();
 
+            $this->cacheValue($name, $value);
+
+            return true;
+
+        }  
+    }
+
+    /**
+     * 返回缓存的前缀，可以通过 cachePrefix 属性设置
+     * 默认为“类名+_cache:”
+     * 
+     * @return [type] [description]
+     */
+    public function cachePrefix()
+    {
+        return property_exists($this, 'cachePrefix') ? $this->cachePrefix : static::class."_cache:";
+    }
+
+    protected function cacheValue($name, $value, $minutes = 60)
+    {
+        Cache::put($this->cachePrefix().$name, $value, $minutes);
         $this->autoload[$name] = $value;
-        return true;
+    }
+
+    /**
+     * Sanitizes a string key.
+     *
+     * 去掉特殊符号，只允许字母、数组和下横线.
+     *
+     * @since 3.0.0
+     *
+     * @param string $key String key
+     * @return string Sanitized key
+     */
+    protected function sanitize_key( $key ) {
+        $key = strtolower( $key );
+        $key = preg_replace( '/[^a-z0-9_\-]/', '', $key );
+
+        return $key;
     }
 
 
