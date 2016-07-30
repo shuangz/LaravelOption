@@ -33,7 +33,8 @@ class OptionRepository{
 
 
     /**
-     * [get description]
+     * 获取一个option
+     * 
      * @param  [type]  $option_name  [description]
      * @param  boolean $default      [description]
      * @return [type]                [description]
@@ -93,6 +94,13 @@ class OptionRepository{
         return true;
     }
 
+    /**
+     * 增加一个option，如果已经存在则返回false
+     * 
+     * @param [type]  $name     [description]
+     * @param [type]  $value    [description]
+     * @param integer $autoload [description]
+     */
     public function add($name, $value, $autoload = 0)
     {
         $name  = $this->sanitize_key($name);
@@ -127,6 +135,13 @@ class OptionRepository{
         return property_exists($this, 'cachePrefix') ? $this->cachePrefix : static::class."_cache:";
     }
 
+    /**
+     * 把option写入缓存
+     * @param  [type]  $name    [description]
+     * @param  [type]  $value   [description]
+     * @param  integer $minutes [description]
+     * @return [type]           [description]
+     */
     protected function cacheValue($name, $value, $minutes = 60)
     {
         Cache::put($this->cachePrefix().$name, $value, $minutes);
