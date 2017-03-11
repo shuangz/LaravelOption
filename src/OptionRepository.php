@@ -95,9 +95,9 @@ class OptionRepository{
     /**
      * 增加一个option，如果已经存在则返回false
      *
-     * @param [type]  $name     [description]
-     * @param [type]  $value    [description]
-     * @param integer $autoload [description]
+     * @param 字符串   $name     [description]
+     * @param 混合类型  $value    [description]
+     * @param 整数 $autoload [description]
      */
     public function add($name, $value, $autoload = 0)
     {
@@ -120,6 +120,15 @@ class OptionRepository{
             return true;
 
         }
+    }
+    /**
+     * 删除一个选项
+     * @param  字符串 $name 需要删除的选项名称
+     * @return 布尔值       返回是否删除成功
+     */
+    public function delete($name)
+    {
+        //TODO:删除一个选项
     }
 
     /**
