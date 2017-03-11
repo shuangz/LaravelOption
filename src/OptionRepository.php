@@ -95,9 +95,9 @@ class OptionRepository{
     /**
      * 增加一个option，如果已经存在则返回false
      *
-     * @param 字符串   $name     [description]
-     * @param 混合类型  $value    [description]
-     * @param 整数 $autoload [description]
+     * @param 字符串    $name      需要增加的选项名称
+     * @param 混合类型  $value     选项的值
+     * @param 整数      $autoload  是否在实例化该类时自动加载，1表示“是”，0表示“否”
      */
     public function add($name, $value, $autoload = 0)
     {
