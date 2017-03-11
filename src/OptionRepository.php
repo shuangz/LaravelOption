@@ -4,6 +4,9 @@ namespace Shuangz\Option;
 
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * 该类只会实例化一次
+ */
 class OptionRepository{
 
 
@@ -13,7 +16,7 @@ class OptionRepository{
      * @var array
      */
     protected $autoload = array();
-    
+
 
     public function __construct()
     {
@@ -34,32 +37,27 @@ class OptionRepository{
 
     /**
      * 获取一个option
-     * 
+     *
      * @param  [type]  $option_name  [description]
      * @param  boolean $default      [description]
      * @return [type]                [description]
      */
     public function get($name, $default = null )
     {
-        
+
         $name = $this->sanitize_key( $name );
 
-
         if ( empty( $name ) ) {
-
             return false;
         }
 
         if (isset($this->autoload[$name])) {
-
             return $this->autoload[$name];
-
         } else {
 
             $value = Cache::remember($this->cachePrefix().$name, 60, function() use ($name) {
                             return OptionModel::where('name', $name)->pluck('value')->first();
                      });
-
 
             if ($value == null)
             {
@@ -73,7 +71,7 @@ class OptionRepository{
 
     /**
      * 更新一个 option 如果不存在则新建并设置该值
-     * 
+     *
      * @param  [type]  $name     [description]
      * @param  [type]  $value    [description]
      * @param  integer $autoload [description]
@@ -96,7 +94,7 @@ class OptionRepository{
 
     /**
      * 增加一个option，如果已经存在则返回false
-     * 
+     *
      * @param [type]  $name     [description]
      * @param [type]  $value    [description]
      * @param integer $autoload [description]
@@ -121,13 +119,13 @@ class OptionRepository{
 
             return true;
 
-        }  
+        }
     }
 
     /**
      * 返回缓存的前缀，可以通过 cachePrefix 属性设置
      * 默认为“类名+_cache:”
-     * 
+     *
      * @return [type] [description]
      */
     public function cachePrefix()
