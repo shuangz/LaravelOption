@@ -157,9 +157,7 @@ class OptionRepository{
 
     /**
      * Sanitizes a string key.
-     *
      * 去掉特殊符号，只允许字母、数组和下横线.
-     *
      * @since 3.0.0
      *
      * @param string $key String key
@@ -168,9 +166,6 @@ class OptionRepository{
     protected function sanitize_key( $key ) {
         $key = strtolower( $key );
         $key = preg_replace( '/[^a-z0-9_\-]/', '', $key );
-
         return $key;
     }
-
-
 }

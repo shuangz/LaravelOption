@@ -1,5 +1,5 @@
 {
-	"name": "shuangz/laravel-option",
+    "name": "shuangz/laravel-option",
     "description": "add option function to laravel",
     "license": "MIT",
     "type": "library",
