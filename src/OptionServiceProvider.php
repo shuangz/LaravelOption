@@ -13,7 +13,7 @@ class OptionServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		
+		$this->loadMigrationsFrom(__DIR__.'/Migrations');
 	}
 
 	/**
@@ -28,6 +28,6 @@ class OptionServiceProvider extends ServiceProvider {
 			return new OptionRepository;
 		});
 
-		
+
 	}
 }
