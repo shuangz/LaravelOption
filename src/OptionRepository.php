@@ -29,7 +29,7 @@ class OptionRepository{
      */
     public function loadAutoOptions()
     {
-        $collection  = OptionModel::where('autoload', '=', 1)->lists('value', 'name');
+        $collection  = OptionModel::where('autoload', '=', 1)->pluck('value', 'name');
 
         $this->autoload = $collection->all();
     }
