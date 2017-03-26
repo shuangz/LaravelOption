@@ -1,7 +1,7 @@
 {
     "name": "shuangz/laravel-option",
     "description": "add option function to laravel",
-    "keywords": "option laravel",
+    "keywords": ["option", "laravel"],
     "license": "MIT",
     "type": "library",
 	"authors": [
