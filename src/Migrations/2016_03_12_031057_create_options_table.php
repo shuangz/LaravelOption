@@ -18,7 +18,6 @@ class CreateOptionsTable extends Migration
             $table->string('name', 64)->unique();
             $table->text('value');
             $table->tinyInteger('autoload')->default(1);
-
         });
     }
 
