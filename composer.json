@@ -11,8 +11,17 @@
     	}
     ],
     "require": {
-        "php": ">=5.5.9",
-        "laravel/framework": ">=5.4"
+        "laravel/framework": ">=5.5"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Shuangz\\Option\\OptionServiceProvider::class,"
+            ],
+            "aliases": {
+                "Option": "Shuangz\\Option\\OptionFacade"
+            }
+        }
     },
     "autoload": {
     	"psr-4": {

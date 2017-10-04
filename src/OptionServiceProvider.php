@@ -2,6 +2,7 @@
 
 namespace Shuangz\Option;
 
+use Shuangz\Option\BottleBus;
 use Illuminate\Support\ServiceProvider;
 
 class OptionServiceProvider extends ServiceProvider {
@@ -25,7 +26,7 @@ class OptionServiceProvider extends ServiceProvider {
 	{
 
 		$this->app->singleton('option', function () {
-			return new OptionRepository;
+			return new OptionRepository(new BottleBus());
 		});
 
 
