@@ -2,19 +2,34 @@
 
 namespace Shuangz\Option;
 
-use Shuangz\Option\BottleBus;
+use Shuangz\Option\Bottle\CacheBottle;
+use Shuangz\Option\Bottle\StaticBottle;
+use Shuangz\Option\Bottle\EloquentBottle;
+use Shuangz\Option\Bottle\BottleInterface;
 
 
 /**
  * 该类只会实例化一次
  */
-class OptionRepository{
+class OptionRepository implements BottleInterface
+{
 
-    protected $bus;
+    /**
+     * 已经加载的容器瓶子
+     *
+     * @var [type]
+     */
+    protected $bottles = [];
 
-    public function __construct(BottleBus $bus)
+    public function __construct()
     {
-        $this->bus = $bus;
+        //这里实例化bottle会造成强耦合
+        //就当他们是默认的bottle吧
+        //前面添加的要比后面添加的权重高
+        //也是就优先从该bottle中取值
+        $this->addBottle(new StaticBottle, "static");
+        $this->addBottle(new CacheBottle, "cache");
+        $this->addBottle(new EloquentBottle, "eloquent");
     }
     /**
      * 获取一个option
@@ -25,8 +40,15 @@ class OptionRepository{
      */
     public function get($name, $default = null )
     {
-        $value = $this->bus->get($name);
-        return $value == null ? $default : $value ;
+        $name = $this->sanitizeName($name);
+
+        foreach ($this->bottles as $bottle) {
+            if(null != $option = $bottle->get($name)) {
+                return $option;
+            }
+        }
+        // 所有瓶子都返回null时，最后才返回$default
+        return $default;
     }
 
     /**
@@ -39,7 +61,11 @@ class OptionRepository{
      */
     public function update($name, $value, $autoload = false)
     {
-        return $this->bus->set($name, $value);
+        $name = $this->sanitizeName($name);
+
+        foreach($this->bottles as $bottle) {
+            $bottle->update($name, $value);
+        }
     }
 
     /**
@@ -51,26 +77,13 @@ class OptionRepository{
      */
     public function add($name, $value, $autoload = 0)
     {
-        $name  = $this->sanitize_key($name);
+        $name = $this->sanitizeName($name);
 
-        $option = OptionModel::firstOrNew(['name' => $name]);
-
-        if ($option->exists) {
-
-            return false;
-
-        } else {
-
-            $option->value    = $value;
-            $option->autoload = $autoload;
-            $option->save();
-
-            $this->cacheValue($name, $value);
-
-            return true;
-
+        foreach($this->bottles as $bottle) {
+            $bottle->add($name, $value);
         }
     }
+
     /**
      * 删除一个选项
      * @param  字符串 $name 需要删除的选项名称
@@ -78,6 +91,31 @@ class OptionRepository{
      */
     public function delete($name)
     {
-        //TODO:删除一个选项
+        $name = $this->sanitizeName($name);
+
+        foreach($this->bottles as $bottle) {
+            $bottle->delete($name);
+        }
+    }
+
+    /**
+     * 全部装换成小写字母
+     * 去掉特殊符号，只允许字母、数组和下横线.
+     *
+     * @param  string  $name  String key
+     * @return string         Sanitized key
+     */
+    protected function sanitizeName( $name ) {
+        $name = strtolower( $name );
+        $name = preg_replace( '/[^a-z0-9_\-]/', '', $name );
+        if ($name) {
+            return $name;
+        }
+        throw new Exception("Name is illegal");
+    }
+
+    public function addBottle(BottleInterface $bottle, $name = '')
+    {
+        $this->bottles[$name] = $bottle;
     }
 }

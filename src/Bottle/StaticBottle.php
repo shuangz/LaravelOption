@@ -18,11 +18,29 @@ class StaticBottle implements BottleInterface
 
 	public function get($name)
 	{
-		return $this->options[$name] ?? null;
+		return self::$options[$name] ?? null;
 	}
 
-	public function set($name, $value)
+	public function update($name, $value)
 	{
-		$this->options[$name] = $value;
+		self::$options[$name] = $value;
+	}
+
+	public function add($name, $value)
+	{
+		if (isset(self::$options[$name])) {
+			return false;
+		}
+		$this->update($name, $value);
+		return true;
+	}
+
+	public function delete($name)
+	{
+		if (isset(self::$options[$name])) {
+			unset(self::$options[$name]);
+			return true;
+		}
+		return false;
 	}
 }

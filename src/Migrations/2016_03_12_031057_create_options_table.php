@@ -17,7 +17,6 @@ class CreateOptionsTable extends Migration
             $table->increments('id');
             $table->string('name', 64)->unique();
             $table->text('value');
-            $table->boolean('autoload')->default(true);
         });
     }
 

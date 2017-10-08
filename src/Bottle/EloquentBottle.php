@@ -23,10 +23,28 @@ class EloquentBottle implements BottleInterface
         return OptionModel::where('name', $name)->pluck('value')->first();
     }
 
-    public function set($name, $value)
+    public function update($name, $value)
     {
         $option        = OptionModel::firstOrNew(['name' => $name]);
         $option->value = $value;
         $option->save();
+    }
+
+    public function add($name, $value)
+    {
+        $option = OptionModel::firstOrNew(['name' => $name]);
+
+        if ($option->exists) {
+            return false;
+        }
+
+        $option->value  = $value;
+        $option->save();
+        return true;
+    }
+
+    public function delete($name)
+    {
+        OptionModel::where('name', $name)->delete();
     }
 }

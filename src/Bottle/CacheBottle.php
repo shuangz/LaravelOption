@@ -15,16 +15,30 @@ class CacheBottle implements BottleInterface
      *
      * @var string
      */
-    protected $prefix = "CacheBottle：";
+    protected $prefix = 'CacheBottle：';
 
     public function get($name)
     {
         return Cache::get($this->peace($name));
     }
 
-    public function set($name, $value)
+    public function update($name, $value)
     {
-        Cache::put($this->peace($name), $value);
+        Cache::forever($this->peace($name), $value);
+    }
+
+    public function add($name, $value)
+    {
+        if(Cache::has($this->peace($name))){
+            return false;
+        }
+        $this->update($name, $value);
+        return true;
+    }
+
+    public function delete($name)
+    {
+        Cache::forget($this->peace($name));
     }
 
     /**
