@@ -16,7 +16,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Shuangz\\Option\\OptionServiceProvider::class"
+                "Shuangz\\Option\\OptionServiceProvider"
             ],
             "aliases": {
                 "Option": "Shuangz\\Option\\OptionFacade"
