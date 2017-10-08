@@ -1,7 +1,7 @@
 ## 获取扩展包
 - 使用`composer require shuangz/laravel-option`命令，将自动下载所需文件，并将依赖写到composer.json文件中。
 
-- 或者编辑`composer.json`文件，添加`shuangz/laravel-option:"master"`到require字段，然后运行`composer update`更新依赖
+- 或者编辑`composer.json`文件，添加`"shuangz/laravel-option":"master"`到require字段，然后运行`composer update`更新依赖
 
 ## 安装方法
 - 打开config目录下的app.php文件；
