@@ -43,9 +43,14 @@ class OptionRepository implements BottleInterface
         $name = $this->sanitizeName($name);
 
         foreach ($this->bottles as $bottle) {
-            if(null != $option = $bottle->get($name)) {
-                return $option;
+            $option = $bottle->get($name);
+            if($option == null) {
+                $nullBottle = $bottle;
+                continue;
             }
+            //如果第一次循环就正确获取了，那么$nullBottle就没有定义
+            isset($nullBottle) ? $nullBottle->add($name, $option) : "";
+            return $option;
         }
         // 所有瓶子都返回null时，最后才返回$default
         return $default;
@@ -73,9 +78,8 @@ class OptionRepository implements BottleInterface
      *
      * @param 字符串    $name      需要增加的选项名称
      * @param 混合类型  $value     选项的值
-     * @param 整数      $autoload  是否在实例化该类时自动加载，1表示“是”，0表示“否”
      */
-    public function add($name, $value, $autoload = 0)
+    public function add($name, $value)
     {
         $name = $this->sanitizeName($name);
 
@@ -114,7 +118,7 @@ class OptionRepository implements BottleInterface
         throw new Exception("Name is illegal");
     }
 
-    public function addBottle(BottleInterface $bottle, $name = '')
+    public function addBottle(BottleInterface $bottle, $name)
     {
         $this->bottles[$name] = $bottle;
     }
